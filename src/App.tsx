@@ -1,26 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Routes, Route, Navigate } from "react-router-dom";
+import { KBarProvider } from "kbar";
+
+import { TasksProvider } from "./context/tasks";
+
+import SplitMenu from "./components/SplitMenu";
+import TaskList from "./components/TaskList";
+import TaskBar from "./components/TaskBar";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <SplitMenu />
+      <Routes>
+        <Route path="/" element={<Navigate replace to="/important" />} />
+        <Route path=":split" element={<TaskList />} />
+      </Routes>
+    </>
   );
 }
 
-export default App;
+function Container() {
+  return (
+    <KBarProvider>
+      <TasksProvider>
+        <App />
+        <TaskBar />
+      </TasksProvider>
+    </KBarProvider>
+  );
+}
+
+export default Container;
