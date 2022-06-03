@@ -146,7 +146,7 @@ export function TasksProvider({ children }) {
   const [addTaskVisible, _setAddTaskVisible] = useState(false);
   const [addSplitVisible, _setAddSplitVisible] = useState(false);
 
-  const visualState = useKBar(({ visualState }) => visualState);
+  const { visualState } = useKBar(({ visualState }) => ({ visualState }));
 
   const { splits, currentSplit, currentIndex } = state;
   const tasks = splits[currentSplit].todo || [];
@@ -211,7 +211,7 @@ export function TasksProvider({ children }) {
     dispatch({ type: "setcurrentindex", payload: { index } });
   }
 
-  const actionOpen = addTaskVisible || addSplitVisible || visualState;
+  const actionOpen = addTaskVisible || addSplitVisible || visualState === 'showing';
 
   return (
     <TasksContext.Provider
