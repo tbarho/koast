@@ -1,4 +1,4 @@
-import { createContext, useCallback, useState, useMemo } from "react";
+import { createContext, useState } from "react";
 import createPersistedReducer from "use-persisted-reducer";
 import { v4 } from "uuid";
 import { useNavigate } from "react-router-dom";
@@ -100,6 +100,34 @@ function completeTask(state, action) {
   };
 }
 
+function deleteTask(state, action) {
+  const currentSplit = state.currentSplit;
+  const { id } = action.payload;
+  const task = state.splits[currentSplit].todo.find((t) => t.id === id);
+
+  if (!task) {
+    console.error(state, action);
+    throw new Error("Task not found");
+  }
+
+  const todo = state.splits[currentSplit].todo.filter((t) => t.id !== id);
+
+  const previousIndex = state.currentIndex;
+  const currentIndex = previousIndex === 0 ? previousIndex : previousIndex - 1;
+
+  return {
+    ...state,
+    currentIndex,
+    splits: {
+      ...state.splits,
+      [currentSplit]: {
+        ...state.splits[currentSplit],
+        todo
+      },
+    },
+  };
+}
+
 function reducer(state, action) {
   switch (action.type) {
     case `reset`:
@@ -126,6 +154,8 @@ function reducer(state, action) {
       return addTask(state, action);
     case "completetask":
       return completeTask(state, action);
+    case "deletetask":
+      return deleteTask(state, action);
     case "next":
       return next(state);
     case "prev":
@@ -163,6 +193,17 @@ export function TasksProvider({ children }) {
     const payload = { id: task.id };
     dispatch({ type: "completetask", payload });
   };
+
+  const deleteTask = (task) => {
+    task = task || currentTask;
+
+    if (!task) {
+      return;
+    }
+
+    const payload = { id: task.id };
+    dispatch({ type: "deletetask", payload });
+  }
 
   function hideAll() {
     _setAddTaskVisible(false);
@@ -231,6 +272,7 @@ export function TasksProvider({ children }) {
         addSplit,
         addTask,
         completeTask,
+        deleteTask,
         next,
         prev,
       }}
