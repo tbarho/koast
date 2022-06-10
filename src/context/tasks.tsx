@@ -8,6 +8,7 @@ import AddSplit from "../components/AddSplit";
 import {
   setCurrentSplit,
   addSplit,
+  removeSplit,
   addTask,
   completeTask,
   deleteTask,
@@ -41,6 +42,8 @@ function reducer(state, action) {
       return setCurrentSplit(state, action);
     case `addsplit`:
       return addSplit(state, action);
+    case `removesplit`:
+      return removeSplit(state, action);
     case "addtask":
       return addTask(state, action);
     case "completetask":
@@ -149,6 +152,15 @@ export function TasksProvider({ children }) {
     hideAll();
   }
 
+  function removeSplit(name) {
+    if (name === 'important') {
+      return;
+    }
+    dispatch({ type: 'removesplit', payload: { name } });
+    navigate("/important", { replace: true });
+    hideAll();
+  }
+
   function addTask(_, taskString) {
     dispatch({ type: "addtask", payload: { name: taskString } });
     hideAll();
@@ -173,6 +185,7 @@ export function TasksProvider({ children }) {
     <TasksContext.Provider
       value={{
         splits,
+        currentSplit,
         currentTask,
         currentIndex,
         tasks,
@@ -185,6 +198,7 @@ export function TasksProvider({ children }) {
         setCurrentIndex,
         reset,
         addSplit,
+        removeSplit,
         addTask,
         completeTask,
         deleteTask,

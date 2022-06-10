@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import { createAction, useRegisterActions } from "kbar";
-import { AiOutlinePlusCircle } from "react-icons/ai";
+import { AiOutlinePlusCircle, AiOutlineMinusSquare } from "react-icons/ai";
 
 import { TasksContext } from "../../context/tasks";
 
@@ -9,9 +9,11 @@ import CommandBar from "../CommandBar";
 function TaskBar() {
   const [actions, setActions] = useState([]) as any;
   const {
+    currentSplit,
     currentTask,
     showAddTask,
     showAddSplit,
+    removeSplit,
     reset,
     completeTask,
     deleteTask,
@@ -25,6 +27,17 @@ function TaskBar() {
     icon: <AiOutlinePlusCircle size={20} />,
     perform: () => {
       showAddTask();
+    },
+  });
+
+  const removeSplitAction = createAction({
+    name: "Remove this Split",
+    // subtitle: "Read the latest news",
+    shortcut: [],
+    keywords: "splits remove delete",
+    icon: <AiOutlineMinusSquare size={20} />,
+    perform: () => {
+      removeSplit(currentSplit);
     },
   });
 
@@ -71,7 +84,15 @@ function TaskBar() {
   });
 
   useEffect(() => {
-    const baseActions = [addTaskAction, addSplitAction, resetAction];
+    let baseActions = [
+      addTaskAction,
+      addSplitAction,
+      resetAction,
+    ];
+
+    if (currentSplit !== 'important') {
+      baseActions.push(removeSplitAction);
+    }
 
     if (!currentTask) {
       setActions(baseActions);
@@ -79,9 +100,7 @@ function TaskBar() {
     }
 
     setActions([...baseActions, completeTaskAction, deleteTaskAction]);
-  }, [
-    currentTask
-  ]);
+  }, [currentSplit, currentTask]);
 
   useRegisterActions(actions, [actions]);
 
