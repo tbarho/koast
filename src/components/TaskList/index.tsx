@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useState, useContext } from "react";
 import styled from "styled-components";
 import moment from "moment";
 import {
@@ -135,11 +135,21 @@ function _TaskList({ className }: any) {
 
   useKeyPress(
     (e) => {
-      if (actionOpen) {
+      if (e.metaKey || e.shiftKey || actionOpen) {
         return;
       }
 
-      if (e.shiftKey) {
+      e.preventDefault();
+
+      prev();
+    },
+    ["KeyK"],
+    [currentIndex, actionOpen]
+  );
+
+  useKeyPress(
+    (e) => {
+      if (actionOpen || e.shiftKey) {
         return;
       }
 
@@ -152,22 +162,32 @@ function _TaskList({ className }: any) {
 
       prev();
     },
-    ["KeyK", "ArrowUp"],
+    ["ArrowUp"],
     [currentIndex, actionOpen]
   );
 
   useKeyPress(
     (e) => {
-      if (actionOpen) {
+      if (e.metaKey || e.shiftKey || actionOpen) {
         return;
       }
-      
-      if (e.shiftKey) {
-        return;
-      }
-      
+
       e.preventDefault();
-      
+
+      next();
+    },
+    ["KeyJ"],
+    [currentIndex, actionOpen]
+  );
+
+  useKeyPress(
+    (e) => {
+      if (actionOpen || e.shiftKey) {
+        return;
+      }
+
+      e.preventDefault();
+
       if (e.metaKey) {
         moveTaskDown();
         return;
@@ -175,7 +195,7 @@ function _TaskList({ className }: any) {
 
       next();
     },
-    ["KeyJ", "ArrowDown"],
+    ["ArrowDown"],
     [currentIndex, actionOpen]
   );
 
