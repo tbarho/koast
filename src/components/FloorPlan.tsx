@@ -250,15 +250,14 @@ function Desks({ scale }: any) {
 }
 
 function Metrics() {
-  const { deskData, metrics, setRentedToEven, setRentedToAll, clear } = useContext(
-    SpaceContext
-  ) as any;
+  const { deskData, metrics, setRentedToEven, setRentedToAll, clear } =
+    useContext(SpaceContext) as any;
 
   const buttonStyles = {
     backgroundColor: PALETTE[0],
     color: PALETTE[2],
     border: `solid 1px ${PALETTE[2]}`,
-    marginTop: 20
+    marginTop: 20,
   };
 
   return (
@@ -275,14 +274,15 @@ function Metrics() {
       |- DESKS: {deskData.length} <br />
       |- RENTED: {metrics.count} <br />
       {/* |- IDS: {metrics.ids.join(",")} <br /> */}
-      |- DAY: {metrics.perDay} <br />
-      |- MONTH: {metrics.perMonth} <br />
-      |- YEAR: {metrics.perYear} <br />
+      |- DAY: ${metrics.perDay} <br />
+      |- MONTH: ${metrics.perMonth} <br />
+      |- YEAR: ${metrics.perYear} <br />
       |- CLIENTS: {metrics.clients} <br />
       |- UTILIZATION: {(metrics.utilization * 100).toFixed(0)}% <br />
-      | <br />
-      | <br />
-      |- AVERAGE CUSTOMER <br />
+      <br />
+      <br />
+      | AVERAGE CUSTOMER <br />
+      |----------------------------- <br />
       |- 3 HOURS / DAY <br />
       |- 3 DAYS / WEEK <br />
       |- ${3 * 3 * 7} / WEEK <br />
@@ -305,28 +305,74 @@ function Metrics() {
   );
 }
 
+const SUNK =
+  (479895 * 24 /* old rent */ + 11500000) /* build out */ /
+  (60 - 24); /* leasable time */
+
+const EXPENSES = {
+  rent_NNN: 479895,
+  utils: 150000,
+  software: 100000,
+  discount_bob: ((3 * 5 * 7 * 52) / 12) * 100,
+  // sunk: SUNK,
+};
+
 function Underutilized() {
   const { deskData, underutilized } = useContext(SpaceContext) as any;
 
+  const style = {
+    color: PALETTE[2],
+    fontFamily: "monospace",
+    marginTop: 20,
+    width: "50%",
+  };
+
+  const stripeFees = underutilized.perMonth * 0.0299;
+  const totalMonthly =
+    Object.keys(EXPENSES).reduce((memo, key) => {
+      memo += EXPENSES[key] / 100;
+      return memo;
+    }, 0) + stripeFees;
+
   return (
-    <div
-      style={{
-        color: PALETTE[2],
-        fontFamily: "monospace",
-        marginTop: 20,
-        width: "50%",
-      }}
-    >
+    <div style={style}>
       | 9 HOUR / DAY (COMMON) <br />
       |----------------------------- <br />
       |- DESKS: {deskData.length} <br />
       |- RENTED: {underutilized.count} <br />
       {/* |- IDS: {underutilized.ids.join(",")} <br /> */}
-      |- DAY: {underutilized.perDay} <br />
-      |- MONTH: {underutilized.perMonth} <br />
-      |- YEAR: {underutilized.perYear} <br />
+      |- DAY: ${underutilized.perDay} <br />
+      |- MONTH: ${underutilized.perMonth} <br />
+      |- YEAR: ${underutilized.perYear} <br />
       |- CLIENTS: {underutilized.clients} <br />
       |- UTILIZATION: {(underutilized.utilization * 100).toFixed(0)}% <br />
+      <br />
+      <br />
+      | EXPENSES <br />
+      |----------------------------- <br />
+      {Object.keys(EXPENSES).map((key) => (
+        <div style={{ ...style, marginTop: 0 }} key={key}>
+          |- {key}: ${(EXPENSES[key] / 100).toFixed(0)}
+        </div>
+      ))}
+      |- fees: ${stripeFees.toFixed(0)} <br />
+      |- TOTAL: ${totalMonthly.toFixed(0)} <br />
+      <br />
+      <br />
+      | MARGIN <br />
+      |----------------------------- <br />
+      |- MONTHLY: ${(underutilized.perMonth - totalMonthly).toFixed(0)} <br />
+      |- ANNUAL: ${((underutilized.perMonth - totalMonthly) * 12).toFixed(
+        0
+      )}{" "}
+      <br />
+      <br />
+      <br />
+      <br />
+      | TODO <br />
+      
+      |- Bid model sampling <br />
+      |- Whimsical an App <br />
     </div>
   );
 }

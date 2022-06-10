@@ -123,16 +123,33 @@ const TaskItem = styled(_TaskItem)`
 `;
 
 function _TaskList({ className }: any) {
-  const { tasks, prev, next, currentIndex, actionOpen }: any =
-    useContext(TasksContext);
+  const {
+    tasks,
+    prev,
+    next,
+    currentIndex,
+    actionOpen,
+    moveTaskUp,
+    moveTaskDown,
+  }: any = useContext(TasksContext);
 
   useKeyPress(
     (e) => {
-      if (e.metaKey || e.shiftKey || actionOpen) {
+      if (actionOpen) {
+        return;
+      }
+
+      if (e.shiftKey) {
         return;
       }
 
       e.preventDefault();
+
+      if (e.metaKey) {
+        moveTaskUp();
+        return;
+      }
+
       prev();
     },
     ["KeyK", "ArrowUp"],
@@ -141,11 +158,21 @@ function _TaskList({ className }: any) {
 
   useKeyPress(
     (e) => {
-      if (e.metaKey || e.shiftKey || actionOpen) {
+      if (actionOpen) {
+        return;
+      }
+      
+      if (e.shiftKey) {
+        return;
+      }
+      
+      e.preventDefault();
+      
+      if (e.metaKey) {
+        moveTaskDown();
         return;
       }
 
-      e.preventDefault();
       next();
     },
     ["KeyJ", "ArrowDown"],
