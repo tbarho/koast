@@ -61,10 +61,8 @@ const actions = [
     id: "blog",
     name: "Blog",
     // subtitle: "Read the latest news",
-    shortcut: ['Meta+b'],
     keywords: "writing words",
     icon: <HomeIcon />,
-    perform: () => console.log('blog'),
   },
   {
     id: "post",

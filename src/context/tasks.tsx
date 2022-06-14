@@ -16,6 +16,7 @@ import {
   prev,
   moveTaskUp,
   moveTaskDown,
+  moveToSplit,
   setCurrentIndex,
 } from "../actions";
 
@@ -58,6 +59,8 @@ function reducer(state, action) {
       return moveTaskUp(state, action);
     case "movetaskdown":
       return moveTaskDown(state, action);
+    case "movetosplit":
+      return moveToSplit(state, action);
     case "setcurrentindex":
       return setCurrentIndex(state, action);
     default:
@@ -121,6 +124,17 @@ export function TasksProvider({ children }) {
     const payload = { id: task.id };
     dispatch({ type: "movetaskdown", payload });
   };
+
+  const moveToSplit = (task, split) => {
+    task = task || currentTask;
+
+    if (!task) {
+      return;
+    }
+
+    dispatch({ type: "movetosplit", payload: { id: task.id, split } });
+    navigate(`/${split}`);
+  }
 
   function hideAll() {
     _setAddTaskVisible(false);
@@ -204,6 +218,7 @@ export function TasksProvider({ children }) {
         deleteTask,
         moveTaskUp,
         moveTaskDown,
+        moveToSplit,
         next,
         prev,
       }}

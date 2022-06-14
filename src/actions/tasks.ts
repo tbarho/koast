@@ -188,3 +188,37 @@ export function moveTaskDown(state, action) {
     },
   };
 }
+
+export function moveToSplit(state, action) {
+  const { id, split } = action.payload;
+
+  if (!state.splits[split]) {
+    throw new Error("Split not found");
+  }
+
+  const task = state.splits[state.currentSplit].todo.find((t) => t.id === id);
+
+  if (!task) {
+    console.error(state, action);
+    throw new Error("Task not found");
+  }
+
+  const todo = state.splits[state.currentSplit].todo.filter((t) => t.id !== id);
+
+  return {
+    ...state,
+    currentSplit: split,
+    currentIndex: 0,
+    splits: {
+      ...state.splits,
+      [split]: {
+        ...state.splits[split],
+        todo: [...state.splits[split].todo, task],
+      },
+      [state.currentSplit]: {
+        ...state.splits[state.currentSplit],
+        todo,
+      },
+    },
+  };
+}

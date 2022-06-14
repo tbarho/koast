@@ -5,10 +5,12 @@ import { AiOutlinePlusCircle, AiOutlineMinusSquare } from "react-icons/ai";
 import { TasksContext } from "../../context/tasks";
 
 import CommandBar from "../CommandBar";
+import { startCase } from "lodash";
 
 function TaskBar() {
   const [actions, setActions] = useState([]) as any;
   const {
+    splits,
     currentSplit,
     currentTask,
     showAddTask,
@@ -17,6 +19,7 @@ function TaskBar() {
     reset,
     completeTask,
     deleteTask,
+    moveToSplit,
   }: any = useContext(TasksContext);
 
   const addTaskAction = createAction({
@@ -83,14 +86,27 @@ function TaskBar() {
     },
   });
 
-  useEffect(() => {
-    let baseActions = [
-      addTaskAction,
-      addSplitAction,
-      resetAction,
-    ];
+  const moveTaskAction = createAction({
+    name: "Move Task",
+    icon: <AiOutlinePlusCircle size={20} />,
+  });
 
-    if (currentSplit !== 'important') {
+  const moveTaskLocations = Object.keys(splits)
+    .filter((k) => k !== currentSplit)
+    .map((key) => {
+      return createAction({
+        name: startCase(key),
+        parent: moveTaskAction.id,
+        perform: () => {
+          moveToSplit(currentTask, key);
+        },
+      });
+    });
+
+  useEffect(() => {
+    let baseActions = [addTaskAction, addSplitAction, resetAction];
+
+    if (currentSplit !== "important") {
       baseActions.push(removeSplitAction);
     }
 
@@ -99,8 +115,14 @@ function TaskBar() {
       return;
     }
 
-    setActions([...baseActions, completeTaskAction, deleteTaskAction]);
-  }, [currentSplit, currentTask]);
+    setActions([
+      ...baseActions,
+      completeTaskAction,
+      deleteTaskAction,
+      moveTaskAction,
+      ...moveTaskLocations,
+    ]);
+  }, [splits, currentSplit, currentTask]);
 
   useRegisterActions(actions, [actions]);
 
