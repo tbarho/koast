@@ -35,6 +35,11 @@ function _SplitMenu({ className }: any) {
     e.preventDefault();
     const currentSplitId = window.location.pathname.replace("/", "");
     const nextSplitId = getNextSplitId(splits, currentSplitId, e.shiftKey);
+
+    if (currentSplitId === nextSplitId) {
+      return;
+    }
+    
     navigate(`/${nextSplitId}`);
   };
 
